@@ -1,0 +1,49 @@
+name: Tic Tac Toe
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: tic-tac-toe
+  cancel-in-progress: false
+
+jobs:
+  play:
+    if: startsWith(github.event.issue.title, 'ttt|')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Apply move
+        run: node scripts/ttt.mjs
+        env:
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_USER: ${{ github.event.issue.user.login }}
+
+      - name: Commit board
+        env:
+          ISSUE_USER: ${{ github.event.issue.user.login }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data assets README.md
+          git diff --cached --quiet || git commit -m "ttt: move by ${ISSUE_USER}"
+          git pull --rebase
+          git push
+
+      - name: Reply and close issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          gh issue comment "$ISSUE_NUMBER" --body-file "$RUNNER_TEMP/ttt-reply.md"
+          gh issue close "$ISSUE_NUMBER" --reason completed

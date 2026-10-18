@@ -1,0 +1,26 @@
+{
+  "board": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+  ],
+  "status": "playing",
+  "winner": null,
+  "line": null,
+  "lastHuman": null,
+  "lastBot": null,
+  "lastUser": null,
+  "stats": {
+    "games": 0,
+    "human": 0,
+    "bot": 0,
+    "draws": 0
+  },
+  "players": {}
+}
